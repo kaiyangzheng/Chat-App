@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import ClipLoader from 'react-spinners/ClipLoader';
 
 import PeopleList from './PeopleList';
 import ChatWindow from './ChatWindow';
