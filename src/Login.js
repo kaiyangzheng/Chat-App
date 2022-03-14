@@ -35,6 +35,7 @@ const Login = ({ setToken, setName, setIsLogin, setCurrentUserId }) => {
             }
         }
     }
+
     const handleSubmit = (e) => {
         e.preventDefault();
         handleLogin();

@@ -36,7 +36,7 @@ function App() {
   return <>
     {!token && isLogin && <Login setToken={setToken} setName={setName} setIsLogin={setIsLogin} setCurrentUserId={setCurrentUserId} />}
     {!token && !isLogin && <Register setToken={setToken} setIsLogin={setIsLogin} setName={setName} setCurrentUserId={setCurrentUserId} />}
-    {token && <Chat token={token} setToken={setToken} setIsLogin={setIsLogin} currentUserId={currentUserId} />}
+    {token && <Chat token={token} setToken={setToken} setIsLogin={setIsLogin} currentUserId={currentUserId} name={name} />}
   </>
 
 }

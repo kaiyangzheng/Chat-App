@@ -4,16 +4,24 @@ import ClipLoader from 'react-spinners/ClipLoader';
 import PeopleList from './PeopleList';
 import ChatWindow from './ChatWindow';
 
-const Chat = ({ token, setToken, setIsLogin, currentUserId }) => {
+
+const Chat = ({ token, setToken, setIsLogin, currentUserId, name }) => {
     const [chats, setChats] = useState([]);
     const [users, setUsers] = useState([]);
     const [userIdInChats, setUserIdInChats] = useState([]);
     const [selectedChat, setSelectedChat] = useState('');
     const [messageValue, setMessageValue] = useState('');
+    const [userFormValue, setUserFormValue] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [showAlert, setShowAlert] = useState(false);
     const [alert, setAlert] = useState({ 'msg': '', 'type': '' })
     const [tick, setTick] = useState(0);
+
+    const messagesEndRef = useRef(null)
+
+    const scrollToBottom = () => {
+        messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -23,6 +31,14 @@ const Chat = ({ token, setToken, setIsLogin, currentUserId }) => {
         }
     }
 
+    const handleAddUser = (e) => {
+        e.preventDefault();
+        let usernames = users.map((user) => { return user.name })
+        if (userFormValue && usernames.includes(userFormValue) && userFormValue != name) {
+            createChat();
+            setUserFormValue('');
+        }
+    }
 
     const getUsers = async () => {
         let myHeaders = new Headers();
@@ -75,7 +91,24 @@ const Chat = ({ token, setToken, setIsLogin, currentUserId }) => {
             .then(response => response.text)
             .then(result => console.log(result))
             .catch(error => console.log('error', error));
+    }
 
+    const createChat = async () => {
+        let userId = users.filter((user) => { return user.name == userFormValue })[0].id
+        let myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("x-access-token", token);
+
+        let requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            redirect: 'follow'
+        };
+
+        const response = await fetch("https://chat-app-api-kz.herokuapp.com/chat/" + userId, requestOptions)
+            .then(response => response.text)
+            .then(result => console.log(result))
+            .catch(error => console.log('error', error));
     }
 
     useEffect(() => {
@@ -117,25 +150,35 @@ const Chat = ({ token, setToken, setIsLogin, currentUserId }) => {
 
 
     return <>
-
-
         <div className="container py-5 px-4">
             <div className="row rounded-lg overflow-hidden shadow">
                 <div className="col-5 px-0">
                     <div className="bg-white">
                         <div className="bg-gray px-4 py-2 bg-light">
-                            <p className="h5 mb-0 py-1">Recent</p>
+                            <p className="h5 mb-0 py-1">Chat</p>
                         </div>
                         <div className="messages-box">
-                            <div className="list-group rounded-0" >
-                                <PeopleList chats={chats} users={users} userIdInChats={userIdInChats} setSelectedChat={setSelectedChat} />
+                            <div className="list-group rounded-0">
+                                <PeopleList chats={chats} users={users} userIdInChats={userIdInChats} setSelectedChat={setSelectedChat} scrollToBottom={scrollToBottom} />
+                            </div>
+                            <div className="container mb-3" style={{ position: "absolute", bottom: "0px" }}>
+                                <div className="row height d-flex justify-content-center align-items-center">
+                                    <div className="col-md-6">
+                                        <form className="form" onSubmit={handleAddUser}>
+                                            <i className="fa fa-search"></i>
+                                            <input type="text" className="form-control form-input" placeholder="Enter a Username" value={userFormValue} onChange={(e) => { setUserFormValue(e.target.value) }} />
+                                            <span className="left-pan"></span>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
                 <div className="col-7 px-0">
                     <div className="px-4 py-5 chat-box bg-white" id="divExample">
-                        <ChatWindow selectedChat={selectedChat} currentUserId={currentUserId} users={users} />
+                        <ChatWindow selectedChat={selectedChat} currentUserId={currentUserId} users={users} messagesEndRef={messagesEndRef} scrollToBottom={scrollToBottom} />
                     </div>
                     <form className="bg-light" onClick={handleSubmit}>
                         <div className="input-group">
