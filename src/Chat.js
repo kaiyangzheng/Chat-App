@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 
 import PeopleList from './PeopleList';
 import ChatWindow from './ChatWindow';
+import UserFilter from './UserFilter';
 
 
 const Chat = ({ token, setToken, setIsLogin, currentUserId, name }) => {
@@ -19,7 +20,11 @@ const Chat = ({ token, setToken, setIsLogin, currentUserId, name }) => {
     const messagesEndRef = useRef(null)
 
     const scrollToBottom = () => {
-        messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }
+
+    const scrollToBottomFast = () => {
+        messagesEndRef.current?.scrollIntoView();
     }
 
     const handleSubmit = (e) => {
@@ -32,6 +37,8 @@ const Chat = ({ token, setToken, setIsLogin, currentUserId, name }) => {
 
     const handleAddUser = (e) => {
         e.preventDefault();
+        console.log('yes');
+        console.log(userFormValue);
         let usernames = users.map((user) => { return user.name })
         if (userFormValue && usernames.includes(userFormValue) && userFormValue != name) {
             createChat();
@@ -151,28 +158,28 @@ const Chat = ({ token, setToken, setIsLogin, currentUserId, name }) => {
     return <>
         <div className="container py-5 px-4">
             <div className="row rounded-lg overflow-hidden shadow">
-                <div className="col-5 px-0">
+                <div className="col-5 px-0 bg-white">
                     <div className="bg-white">
                         <div className="bg-gray px-4 py-2 bg-light">
                             <p className="h5 mb-0 py-1">Chat</p>
                         </div>
-                        <div className="messages-box">
+                        <div className="messages-box" style={{ borderBottom: "0.5px solid #D3D3D3" }}>
                             <div className="list-group rounded-0">
-                                <PeopleList chats={chats} users={users} userIdInChats={userIdInChats} setSelectedChat={setSelectedChat} scrollToBottom={scrollToBottom} />
+                                <PeopleList chats={chats} users={users} userIdInChats={userIdInChats} setSelectedChat={setSelectedChat} scrollToBottomFast={scrollToBottomFast} />
                             </div>
-                            <div className="container mb-3" style={{ position: "absolute", bottom: "0px" }}>
-                                <div className="row height d-flex justify-content-center align-items-center">
-                                    <div className="col-md-6">
-                                        <form className="form" onSubmit={handleAddUser}>
-                                            <i className="fa fa-search"></i>
-                                            <input type="text" className="form-control form-input" placeholder="Enter a Username" value={userFormValue} onChange={(e) => { setUserFormValue(e.target.value) }} />
-                                            <span className="left-pan"></span>
-                                        </form>
-                                    </div>
+                        </div>
+                        <div className="container mb-3 " style={{ position: "absolute", bottom: "0px" }}>
+                            <div className="row height d-flex justify-content-center align-items-center">
+                                <div className="col-md-6">
+                                    <form className="form" onSubmit={handleAddUser}>
+                                        <i className="fa fa-search"></i>
+                                        <input type="text" className="form-control form-input bg-light" placeholder="Enter a Username" value={userFormValue} onChange={(e) => { setUserFormValue(e.target.value) }} />
+                                        <span className="left-pan"></span>
+                                    </form>
+                                    {/* <UserFilter users={users} currentUserId={currentUserId} handleAddUser={handleAddUser} userFormValue={userFormValue} setUserFormValue={setUserFormValue}></UserFilter> */}
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
                 <div className="col-7 px-0">

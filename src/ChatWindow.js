@@ -7,6 +7,7 @@ const ChatWindow = ({ selectedChat, currentUserId, userIdInChats, chats, users, 
     const [otherUserInfo, setOtherUserInfo] = useState({});
     const [messages, setMessages] = useState([]);
     const [messageLength, setMessageLength] = useState(0);
+    const [currSelectedChat, setCurrSelectedChat] = useState(selectedChat);
 
     useEffect(() => {
         setMessages(selectedChat.messages)
@@ -32,14 +33,20 @@ const ChatWindow = ({ selectedChat, currentUserId, userIdInChats, chats, users, 
 
 
     return <>
-        {messages?.map((message) => {
+        {messages?.map((message, index) => {
             if (message.user_id == currentUserId) {
+                if (index == messages.length - 1) {
+                    return <RecieverMessage text={message.text} sendTime={message.send_time} messagesEndRef={messagesEndRef} />
+                }
                 return <RecieverMessage text={message.text} sendTime={message.send_time} />
             } else {
+                if (index == messages.length - 1) {
+                    return <SenderMessage text={message.text} sendTime={message.send_time} messagesEndRef={messagesEndRef} />
+                }
                 return <SenderMessage text={message.text} sendTime={message.send_time} />
             }
         })}
-        <div ref={messagesEndRef} />
+        <div id="end"></div>
     </>
 
 }
