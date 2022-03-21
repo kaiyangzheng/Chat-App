@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 
 import PeopleList from './PeopleList';
 import ChatWindow from './ChatWindow';
-import UserFilter from './UserFilter';
+import TextField from '@mui/material/TextField';
 
-
-const Chat = ({ token, setToken, setIsLogin, currentUserId, name }) => {
+const Chat = ({ token, currentUserId, name }) => {
     const [chats, setChats] = useState([]);
+    const [sortedChats, setSortedChats] = useState([]);
     const [users, setUsers] = useState([]);
     const [userIdInChats, setUserIdInChats] = useState([]);
     const [selectedChat, setSelectedChat] = useState('');
@@ -37,8 +37,6 @@ const Chat = ({ token, setToken, setIsLogin, currentUserId, name }) => {
 
     const handleAddUser = (e) => {
         e.preventDefault();
-        console.log('yes');
-        console.log(userFormValue);
         let usernames = users.map((user) => { return user.name })
         if (userFormValue && usernames.includes(userFormValue) && userFormValue != name) {
             createChat();
@@ -74,7 +72,12 @@ const Chat = ({ token, setToken, setIsLogin, currentUserId, name }) => {
 
         const response = await fetch("https://chat-app-api-kz.herokuapp.com/chat", requestOptions);
         const responseChats = await response.json()
-        setChats(responseChats['chats']);
+        let sorted = [...responseChats['chats']].sort(function (a, b) {
+            return new Date(a.messages[a.messages.length - 1]?.send_time) - new Date(b.messages[b.messages.length - 1]?.send_time);
+        })
+        setChats(sorted.reverse());
+        setSortedChats(sorted);
+
     }
 
     const postMessage = async () => {
@@ -135,6 +138,11 @@ const Chat = ({ token, setToken, setIsLogin, currentUserId, name }) => {
     }, [tick])
 
     useEffect(() => {
+        getChats();
+        getUsers();
+    }, [])
+
+    useEffect(() => {
         for (let i = 0; i < chats.length; i++) {
             if (chats[i].id == selectedChat.id) {
                 setSelectedChat(chats[i]);
@@ -155,42 +163,36 @@ const Chat = ({ token, setToken, setIsLogin, currentUserId, name }) => {
     }, [chats, users])
 
 
+
     return <>
-        <div className="container py-5 px-4">
+        <div className="container py-5 px-4" >
             <div className="row rounded-lg overflow-hidden shadow">
                 <div className="col-5 px-0 bg-white">
                     <div className="bg-white">
                         <div className="bg-gray px-4 py-2 bg-light">
-                            <p className="h5 mb-0 py-1">Chat</p>
+                            <p className="h5 mb-0 py-1">Direct Messages</p>
                         </div>
-                        <div className="messages-box" style={{ borderBottom: "0.5px solid #D3D3D3" }}>
+                        <div className="messages-box">
                             <div className="list-group rounded-0">
-                                <PeopleList chats={chats} users={users} userIdInChats={userIdInChats} setSelectedChat={setSelectedChat} scrollToBottomFast={scrollToBottomFast} />
+                                <form onSubmit={handleAddUser} style={{ marginBottom: "1rem", textAlign: "center" }} autocomplete="off">
+                                    <TextField id="standard-basic" label="Add chat" variant="standard" value={userFormValue} onChange={(e) => setUserFormValue(e.target.value)} style={{ width: "90%", marginBottom: "1rem" }} />
+                                </form>
+                                <PeopleList chats={chats} sortedChats={sortedChats} users={users} userIdInChats={userIdInChats} setSelectedChat={setSelectedChat} scrollToBottomFast={scrollToBottomFast} messagesEndRef={messagesEndRef} currentUserId={currentUserId} selectedChat={selectedChat} />
                             </div>
                         </div>
-                        <div className="container mb-3 " style={{ position: "absolute", bottom: "0px" }}>
-                            <div className="row height d-flex justify-content-center align-items-center">
-                                <div className="col-md-6">
-                                    <form className="form" onSubmit={handleAddUser}>
-                                        <i className="fa fa-search"></i>
-                                        <input type="text" className="form-control form-input bg-light" placeholder="Enter a Username" value={userFormValue} onChange={(e) => { setUserFormValue(e.target.value) }} />
-                                        <span className="left-pan"></span>
-                                    </form>
-                                    {/* <UserFilter users={users} currentUserId={currentUserId} handleAddUser={handleAddUser} userFormValue={userFormValue} setUserFormValue={setUserFormValue}></UserFilter> */}
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
                 <div className="col-7 px-0">
                     <div className="px-4 py-5 chat-box bg-white" id="divExample">
                         <ChatWindow selectedChat={selectedChat} currentUserId={currentUserId} users={users} messagesEndRef={messagesEndRef} scrollToBottom={scrollToBottom} />
                     </div>
+
                     <form className="bg-light" onClick={handleSubmit}>
                         <div className="input-group">
-                            <input type="text" placeholder='Type a message' className="form-control rounded-0 border-0 py-4 bg-light" value={messageValue} onChange={(e) => { setMessageValue(e.target.value) }} />
+                            {selectedChat ? <input type="text" placeholder='Type a message' className="form-control rounded-0 border-0 py-4 bg-light" value={messageValue} onChange={(e) => { setMessageValue(e.target.value) }} /> : <input type="text" placeholder='Type a message' className="form-control rounded-0 border-0 py-4 bg-light" value={messageValue} onChange={(e) => { setMessageValue(e.target.value) }} disabled style={{ cursor: "not-allowed" }} />}
                             <div className="input-group-append">
-                                <button id="button-addon2" type="submit" className="btn btn-link" > <i className="fa fa-paper-plane"></i></button>
+                                {selectedChat ? <button id="button-addon2" type="submit" className="btn btn-link" > <i className="fa fa-paper-plane"></i></button> : <button style={{ cursor: "not-allowed" }} disabled id="button-addon2" type="submit" className="btn btn-link" > <i className="fa fa-paper-plane"></i></button>}
                             </div>
                         </div>
                     </form>

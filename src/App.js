@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Login from './Login';
 import Register from './Register';
 import Chat from './Chat';
-
+import Navbar from './Nav';
 
 function App() {
   const [token, setToken] = useState(() => {
@@ -29,11 +29,11 @@ function App() {
     localStorage.setItem("currUserId", currentUserId)
   }, [token, name, currentUserId])
 
-  const logout = () => {
-    setToken('');
-  }
+
+
 
   return <>
+    {token && <Navbar setToken={setToken} setIsLogin={setIsLogin} name={name} />}
     {!token && isLogin && <Login setToken={setToken} setName={setName} setIsLogin={setIsLogin} setCurrentUserId={setCurrentUserId} />}
     {!token && !isLogin && <Register setToken={setToken} setIsLogin={setIsLogin} setName={setName} setCurrentUserId={setCurrentUserId} />}
     {token && <Chat token={token} setToken={setToken} setIsLogin={setIsLogin} currentUserId={currentUserId} name={name} />}

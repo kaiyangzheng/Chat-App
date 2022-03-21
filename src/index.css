@@ -581,9 +581,10 @@ body {
   overflow-y: scroll;
 }
 
-.messages-box{
-  height: 420px;
+.chat-box{
+  height: 535px
 }
+
 
 .rounded-lg {
   border-radius: 0.5rem;
@@ -676,3 +677,8 @@ html {
       text-decoration: none;
       color: inherit;
  }
+
+.selected{
+  background-color: var(--dark-shadow);
+}
+
