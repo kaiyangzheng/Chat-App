@@ -4,10 +4,9 @@ import PeopleList from './PeopleList';
 import ChatWindow from './ChatWindow';
 import TextField from '@mui/material/TextField';
 
-const Chat = ({ token, currentUserId, name, notifications, setNotifications, chats, setChats, users, setUsers }) => {
+const Chat = ({ token, currentUserId, name, notifications, setNotifications, chats, setChats, users, setUsers, selectedChat, setSelectedChat, messagesEndRef, scrollToBottomFast }) => {
     const [sortedChats, setSortedChats] = useState([]);
     const [userIdInChats, setUserIdInChats] = useState([]);
-    const [selectedChat, setSelectedChat] = useState('');
     const [messageValue, setMessageValue] = useState('');
     const [userFormValue, setUserFormValue] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -16,14 +15,8 @@ const Chat = ({ token, currentUserId, name, notifications, setNotifications, cha
     const [tick, setTick] = useState(0);
     const [chatMessageLengths, setChatMessageLengths] = useState({})
 
-    const messagesEndRef = useRef(null)
-
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    }
-
-    const scrollToBottomFast = () => {
-        messagesEndRef.current?.scrollIntoView();
     }
 
     const handleSubmit = (e) => {
@@ -182,11 +175,10 @@ const Chat = ({ token, currentUserId, name, notifications, setNotifications, cha
     }, [chats])
 
     useEffect(() => {
-        if (notifications.includes(selectedChat.id)) {
+        if (notifications.includes(selectedChat.id) && document.hasFocus()) {
             setNotifications(notifications.filter((chat) => chat != selectedChat.id))
         }
     }, [notifications, selectedChat])
-
 
     return <>
         <div className="container py-5 px-4" style={{ marginTop: "-1.9rem" }}>

@@ -37,7 +37,7 @@ const PeopleList = ({ chats, sortedChats, userIdInChats, users, setSelectedChat,
                     <button type="submit" style={{ backgroundColor: "#ececf6" }} className="list-group-item list-group-item-action list-group-item-light rounded-0" key={id} onClick={() => { setSelectedChat(chats.filter((chat) => { return chat.id == id })[0]); }} >
                         < div className="media" >
                             <Avatar style={{ backgroundColor: color }}>
-                                {name.toUpperCase().charAt(0)}
+                                {name?.toUpperCase().charAt(0)}
                             </Avatar>
                             <div className="media-body ml-4">
                                 <div className="d-md-flex align-items-center justify-content-between mb-1">

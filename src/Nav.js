@@ -58,7 +58,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-export default function PrimarySearchAppBar({ setIsLogin, setToken, name, notifications, chats, currentUserId, users }) {
+export default function PrimarySearchAppBar({ setIsLogin, setToken, name, notifications, chats, currentUserId, users, setSelectedChat, scrollToBottomFast }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
@@ -153,7 +153,7 @@ export default function PrimarySearchAppBar({ setIsLogin, setToken, name, notifi
             open={isNotiMenuOpen}
             onClose={handleNotiMenuClose}
         >
-            {notifications.length !== 0 && <MenuItem onClick={handleNotiMenuClose}>New notifications</MenuItem>}
+            {notifications.length !== 0 && <MenuItem onClick={handleNotiMenuClose}>New Messages: </MenuItem>}
             {notifications.length === 0 && <MenuItem onClick={handleNotiMenuClose}>No new notifications</MenuItem>}
             {notifications.map((noti, index) => {
                 let notiChat = chats.filter(chat => chat.id == noti)[0];
@@ -164,7 +164,7 @@ export default function PrimarySearchAppBar({ setIsLogin, setToken, name, notifi
                     notiName = users?.filter((user) => user.id == notiChat.user2_id)[0].name;
                 }
                 return (
-                    <MenuItem onClick={handleNotiMenuClose} key={index}>{notiName}</MenuItem>
+                    <MenuItem onClick={() => { handleNotiMenuClose(); setSelectedChat(notiChat); }} key={index}>{notiName}</MenuItem>
                 )
 
             })}
@@ -197,7 +197,7 @@ export default function PrimarySearchAppBar({ setIsLogin, setToken, name, notifi
                 </IconButton>
                 <p>Messages</p>
             </MenuItem>
-            <MenuItem>
+            <MenuItem onClick={handleNotiMenuOpen}>
                 <IconButton
                     size="large"
                     aria-label="show 17 new notifications"

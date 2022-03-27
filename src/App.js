@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import Login from './Login';
 import Register from './Register';
@@ -26,6 +26,9 @@ function App() {
   const [notifications, setNotifications] = useState([])
   const [chats, setChats] = useState([]);
   const [users, setUsers] = useState([]);
+  const [selectedChat, setSelectedChat] = useState('');
+  const messagesEndRef = useRef(null)
+
 
   useEffect(() => {
     localStorage.setItem("token", token);
@@ -41,12 +44,16 @@ function App() {
     }
   }, [notifications])
 
+  const scrollToBottomFast = () => {
+    messagesEndRef.current?.scrollIntoView();
+  }
+
 
   return <>
-    {token && <Navbar setToken={setToken} setIsLogin={setIsLogin} name={name} notifications={notifications} chats={chats} currentUserId={currentUserId} users={users} />}
+    {token && <Navbar setToken={setToken} setIsLogin={setIsLogin} name={name} notifications={notifications} chats={chats} currentUserId={currentUserId} users={users} setSelectedChat={setSelectedChat} scrollToBottomFast={scrollToBottomFast} />}
     {!token && isLogin && <Login setToken={setToken} setName={setName} setIsLogin={setIsLogin} setCurrentUserId={setCurrentUserId} />}
     {!token && !isLogin && <Register setToken={setToken} setIsLogin={setIsLogin} setName={setName} setCurrentUserId={setCurrentUserId} />}
-    {token && <Chat token={token} setToken={setToken} setIsLogin={setIsLogin} currentUserId={currentUserId} name={name} notifications={notifications} setNotifications={setNotifications} chats={chats} setChats={setChats} users={users} setUsers={setUsers} />}
+    {token && <Chat token={token} setToken={setToken} setIsLogin={setIsLogin} currentUserId={currentUserId} name={name} notifications={notifications} setNotifications={setNotifications} chats={chats} setChats={setChats} users={users} setUsers={setUsers} selectedChat={selectedChat} setSelectedChat={setSelectedChat} messagesEndRef={messagesEndRef} scrollToBottomFast={scrollToBottomFast} />}
   </>
 
 }
