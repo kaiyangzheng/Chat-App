@@ -35,7 +35,6 @@ const ChatWindow = ({ selectedChat, currentUserId, userIdInChats, chats, users, 
         }
     }, [selectedChat, users])
 
-
     return <>
         {messages?.map((message, index) => {
             if (message.user_id == currentUserId) {
@@ -45,9 +44,9 @@ const ChatWindow = ({ selectedChat, currentUserId, userIdInChats, chats, users, 
                 return <RecieverMessage text={message.text} sendTime={message.send_time} />
             } else {
                 if (index == messages.length - 1) {
-                    return <SenderMessage text={message.text} sendTime={message.send_time} />
+                    return <SenderMessage text={message.text} sendTime={message.send_time} otherUsername={otherUserInfo.name} />
                 }
-                return <SenderMessage text={message.text} sendTime={message.send_time} />
+                return <SenderMessage text={message.text} sendTime={message.send_time} otherUsername={otherUserInfo.name} />
             }
         })}
         <div ref={messagesEndRef}></div>

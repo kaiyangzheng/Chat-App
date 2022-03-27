@@ -4,10 +4,8 @@ import PeopleList from './PeopleList';
 import ChatWindow from './ChatWindow';
 import TextField from '@mui/material/TextField';
 
-const Chat = ({ token, currentUserId, name }) => {
-    const [chats, setChats] = useState([]);
+const Chat = ({ token, currentUserId, name, notifications, setNotifications, chats, setChats, users, setUsers }) => {
     const [sortedChats, setSortedChats] = useState([]);
-    const [users, setUsers] = useState([]);
     const [userIdInChats, setUserIdInChats] = useState([]);
     const [selectedChat, setSelectedChat] = useState('');
     const [messageValue, setMessageValue] = useState('');
@@ -16,6 +14,7 @@ const Chat = ({ token, currentUserId, name }) => {
     const [showAlert, setShowAlert] = useState(false);
     const [alert, setAlert] = useState({ 'msg': '', 'type': '' })
     const [tick, setTick] = useState(0);
+    const [chatMessageLengths, setChatMessageLengths] = useState({})
 
     const messagesEndRef = useRef(null)
 
@@ -163,9 +162,34 @@ const Chat = ({ token, currentUserId, name }) => {
     }, [chats, users])
 
 
+    useEffect(() => {
+        let chatMessageLengths = {}
+        for (let i = 0; i < chats.length; i++) {
+            chatMessageLengths[chats[i].id] = chats[i].messages.length
+        }
+        setChatMessageLengths(chatMessageLengths)
+    }, [chats, users])
+
+
+    useEffect(() => {
+        for (let i = 0; i < chats?.length; i++) {
+            let chatId = chats[i].id;
+            if (chats[i].messages.length > chatMessageLengths[chatId]) {
+                setNotifications([...notifications, chatId])
+                setChatMessageLengths({ ...chatMessageLengths, [chatId]: chats[i].messages.length });
+            }
+        }
+    }, [chats])
+
+    useEffect(() => {
+        if (notifications.includes(selectedChat.id)) {
+            setNotifications(notifications.filter((chat) => chat != selectedChat.id))
+        }
+    }, [notifications, selectedChat])
+
 
     return <>
-        <div className="container py-5 px-4" >
+        <div className="container py-5 px-4" style={{ marginTop: "-1.9rem" }}>
             <div className="row rounded-lg overflow-hidden shadow">
                 <div className="col-5 px-0 bg-white">
                     <div className="bg-white">
@@ -177,7 +201,7 @@ const Chat = ({ token, currentUserId, name }) => {
                                 <form onSubmit={handleAddUser} style={{ marginBottom: "1rem", textAlign: "center" }} autocomplete="off">
                                     <TextField id="standard-basic" label="Add chat" variant="standard" value={userFormValue} onChange={(e) => setUserFormValue(e.target.value)} style={{ width: "90%", marginBottom: "1rem" }} />
                                 </form>
-                                <PeopleList chats={chats} sortedChats={sortedChats} users={users} userIdInChats={userIdInChats} setSelectedChat={setSelectedChat} scrollToBottomFast={scrollToBottomFast} messagesEndRef={messagesEndRef} currentUserId={currentUserId} selectedChat={selectedChat} />
+                                <PeopleList chats={chats} sortedChats={sortedChats} users={users} userIdInChats={userIdInChats} setSelectedChat={setSelectedChat} scrollToBottomFast={scrollToBottomFast} messagesEndRef={messagesEndRef} currentUserId={currentUserId} selectedChat={selectedChat} notifications={notifications} />
                             </div>
                         </div>
 

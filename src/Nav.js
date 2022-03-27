@@ -58,9 +58,12 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-export default function PrimarySearchAppBar({ setIsLogin, setToken, name }) {
+export default function PrimarySearchAppBar({ setIsLogin, setToken, name, notifications, chats, currentUserId, users }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+
+    const [notiAnchorEl, setNotiAnchorEl] = React.useState(null);
+    const isNotiMenuOpen = Boolean(notiAnchorEl);
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -68,6 +71,14 @@ export default function PrimarySearchAppBar({ setIsLogin, setToken, name }) {
     const handleProfileMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
+
+    const handleNotiMenuOpen = (e) => {
+        setNotiAnchorEl(e.currentTarget);
+    }
+
+    const handleNotiMenuClose = (e) => {
+        setNotiAnchorEl(null);
+    }
 
     const handleMobileMenuClose = () => {
         setMobileMoreAnchorEl(null);
@@ -126,6 +137,40 @@ export default function PrimarySearchAppBar({ setIsLogin, setToken, name }) {
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
         </Menu>
     );
+
+    const renderNotiMenu = (
+        <Menu
+            anchorEl={notiAnchorEl}
+            anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+            }}
+            keepMounted
+            transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+            }}
+            open={isNotiMenuOpen}
+            onClose={handleNotiMenuClose}
+        >
+            {notifications.length !== 0 && <MenuItem onClick={handleNotiMenuClose}>New notifications</MenuItem>}
+            {notifications.length === 0 && <MenuItem onClick={handleNotiMenuClose}>No new notifications</MenuItem>}
+            {notifications.map((noti, index) => {
+                let notiChat = chats.filter(chat => chat.id == noti)[0];
+                let notiName = "";
+                if (notiChat.user1_id != currentUserId) {
+                    notiName = users?.filter((user) => user.id == notiChat.user1_id)[0].name;
+                } else {
+                    notiName = users?.filter((user) => user.id == notiChat.user2_id)[0].name;
+                }
+                return (
+                    <MenuItem onClick={handleNotiMenuClose} key={index}>{notiName}</MenuItem>
+                )
+
+            })}
+        </Menu>
+
+    )
 
     const mobileMenuId = 'primary-search-account-menu-mobile';
     const renderMobileMenu = (
@@ -208,11 +253,12 @@ export default function PrimarySearchAppBar({ setIsLogin, setToken, name }) {
                             </Badge>
                         </IconButton>
                         <IconButton
+                            onClick={handleNotiMenuOpen}
                             size="large"
                             aria-label="show 17 new notifications"
                             color="inherit"
                         >
-                            <Badge badgeContent={0} color="error">
+                            <Badge badgeContent={notifications.length} color="error">
                                 <NotificationsIcon />
                             </Badge>
                         </IconButton>
@@ -246,6 +292,7 @@ export default function PrimarySearchAppBar({ setIsLogin, setToken, name }) {
             </AppBar>
             {renderMobileMenu}
             {renderMenu}
+            {renderNotiMenu}
         </Box>
     );
 }
